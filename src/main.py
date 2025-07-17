@@ -1,4 +1,4 @@
-from utils import boot
+from utils.boot import boot
 
 def main():
     config = boot("main")

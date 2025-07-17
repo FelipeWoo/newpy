@@ -37,20 +37,18 @@ run:
 	@cd $(SRC_DIR) && $(PYTHON) run main.py
 
 test:
-	APP_ENV=test $(PYTHON) add -e .
-	APP_ENV=test pytest $(TEST_DIR)
+	APP_ENV=test $(PYTHON) pip install -e .
+	APP_ENV=test $(PYTHON) run -m pytest $(TEST_DIR)
 
 cov:
-	APP_ENV=test pytest --cov=$(SRC_DIR) --cov-report=term-missing
+	APP_ENV=test $(PYTHON) run -m pytest --cov=$(SRC_DIR) --cov-report=term-missing
 
 lint:
-	$(PYTHON) add ruff black
-	ruff check $(SRC_DIR) $(TEST_DIR)
-	black --check $(SRC_DIR) $(TEST_DIR)
+	$(PYTHON) run ruff check $(SRC_DIR) $(TEST_DIR)
+	$(PYTHON) run black --check $(SRC_DIR) $(TEST_DIR)
 
 ty:
-	$(PYTHON) add -U ty
-	ty check $(SRC_DIR)
+	$(PYTHON) run ty check $(SRC_DIR)
 
 check: lint ty
 
@@ -61,7 +59,3 @@ clean:
 
 reset: clean
 	rm -rf .venv logs
-
-jupyter:
-	$(PYTHON) add notebook ipykernel
-	$(PYTHON) run -m notebook $(NOTEBOOK_DIR)
