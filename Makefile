@@ -13,7 +13,7 @@ ifneq ("$(wildcard $(ENV_FILE))","")
 	export
 endif
 
-.PHONY: help init run test cov lint ty check clean reset jupyter
+.PHONY: help init run test cov lint ty check clean reset
 
 help:
 	@echo "Available commands:"
@@ -26,7 +26,7 @@ help:
 	@echo "  make check        - Run lint + ty checks"
 	@echo "  make clean        - Remove compiled and temporary files"
 	@echo "  make reset        - Remove env, logs, __pycache__, etc."
-	@echo "  make jupyter      - Install and launch Jupyter Notebook in scripts/notebooks"
+
 
 init:
 	$(PYTHON) init
