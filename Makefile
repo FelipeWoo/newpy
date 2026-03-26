@@ -33,18 +33,22 @@ init:
 	uv sync --extra dev --extra api --extra tools
 
 add:
+	clear
 	@test -n "$(p)" || (echo "Use: make add p=package_name" && exit 1)
 	uv add $(p)
 
 add-dev:
+	clear
 	@test -n "$(p)" || (echo "Use: make add-dev p=package_name" && exit 1)
 	uv add --optional dev $(p)
 
 add-api:
+	clear
 	@test -n "$(p)" || (echo "Use: make add-api p=package_name" && exit 1)
 	uv add --optional api $(p)
 
 add-tools:
+	clear
 	@test -n "$(p)" || (echo "Use: make add-tools p=package_name" && exit 1)
 	uv add --optional tools $(p)
 
@@ -76,6 +80,7 @@ ty:
 check: lint ty test
 
 clean:
+	clear
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	rm -rf .pytest_cache .coverage coverage.xml htmlcov
@@ -87,5 +92,6 @@ reset: clean
 	uv sync --extra dev --extra api --extra tools
 
 requirements:
+	clear
 	uv lock --upgrade
 	uv export --format requirements.txt > requirements.txt
