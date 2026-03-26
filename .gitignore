@@ -205,3 +205,6 @@ __marimo__/
 
 # Custom
 .private/
+
+data/raw/
+data/processed/

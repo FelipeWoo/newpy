@@ -1,61 +1,91 @@
-# Makefile for Python project
-
-PYTHON := uv
 ENV_FILE := .env
-TEST_ENV_FILE := .env.test
-SRC_DIR := src
-TEST_DIR := tests
-NOTEBOOK_DIR := scripts/notebooks
+APP_DIR := app
+TEST_DIR := app/tests
 
-# Load environment variables (optional fallback if .env exists)
 ifneq ("$(wildcard $(ENV_FILE))","")
-	include $(ENV_FILE)
-	export
+include $(ENV_FILE)
+export
 endif
 
-.PHONY: help init run test cov lint ty check clean reset
+.PHONY: help init add add-dev add-api add-tools run test cov lint format ty check clean reset requirements
 
 help:
 	@echo "Available commands:"
-	@echo "  make init         - Create virtual environment and install dependencies"
-	@echo "  make run          - Run the main program"
-	@echo "  make test         - Run tests"
-	@echo "  make cov          - Run tests with coverage"
-	@echo "  make lint         - Run code formatters and linters"
-	@echo "  make ty           - Run ty (static type checker)"
-	@echo "  make check        - Run lint + ty checks"
-	@echo "  make clean        - Remove compiled and temporary files"
-	@echo "  make reset        - Remove env, logs, __pycache__, etc."
-
+	@echo "  make init                 - Create virtual environment and install dependencies"
+	@echo "  make add p=fastapi        - Add a base package"
+	@echo "  make add-dev p=pytest     - Add a package to dev extra"
+	@echo "  make add-api p=fastapi    - Add a package to api extra"
+	@echo "  make add-tools p=pandas   - Add a package to tools extra"
+	@echo "  make run                  - Run the main program"
+	@echo "  make test                 - Run tests"
+	@echo "  make cov                  - Run tests with coverage"
+	@echo "  make lint                 - Run linters"
+	@echo "  make format               - Format code"
+	@echo "  make ty                   - Run ty type checker"
+	@echo "  make check                - Run lint + ty + test"
+	@echo "  make clean                - Remove temporary files"
+	@echo "  make reset                - Recreate environment"
+	@echo "  make requirements         - Export requirements.txt from uv.lock"
 
 init:
-	$(PYTHON) init
-	$(PYTHON) venv
-	$(PYTHON) add -r requirements.txt
+	clear
+	uv venv
+	uv sync --extra dev --extra api --extra tools
+
+add:
+	@test -n "$(p)" || (echo "Use: make add p=package_name" && exit 1)
+	uv add $(p)
+
+add-dev:
+	@test -n "$(p)" || (echo "Use: make add-dev p=package_name" && exit 1)
+	uv add --optional dev $(p)
+
+add-api:
+	@test -n "$(p)" || (echo "Use: make add-api p=package_name" && exit 1)
+	uv add --optional api $(p)
+
+add-tools:
+	@test -n "$(p)" || (echo "Use: make add-tools p=package_name" && exit 1)
+	uv add --optional tools $(p)
 
 run:
-	@cd $(SRC_DIR) && $(PYTHON) run main.py
+	clear
+	uv run python -m app.main
 
 test:
-	APP_ENV=test $(PYTHON) pip install -e .
-	APP_ENV=test $(PYTHON) run -m pytest $(TEST_DIR)
+	clear
+	APP_ENV=test uv run pytest $(TEST_DIR) -v -s
 
 cov:
-	APP_ENV=test $(PYTHON) run -m pytest --cov=$(SRC_DIR) --cov-report=term-missing
+	clear
+	APP_ENV=test uv run pytest $(TEST_DIR) --cov=$(APP_DIR) --cov-report=term-missing
 
 lint:
-	$(PYTHON) run ruff check $(SRC_DIR) $(TEST_DIR)
-	$(PYTHON) run black --check $(SRC_DIR) $(TEST_DIR)
+	clear
+	uv run ruff check $(APP_DIR) $(TEST_DIR)
+
+format:
+	clear
+	uv run black $(APP_DIR) $(TEST_DIR)
+	uv run ruff check $(APP_DIR) $(TEST_DIR) --fix
 
 ty:
-	$(PYTHON) run ty check $(SRC_DIR)
+	clear
+	uv run ty check $(APP_DIR)
 
-check: lint ty
+check: lint ty test
 
 clean:
 	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -exec rm -r {} +
-	rm -rf .pytest_cache .coverage coverage.xml
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	rm -rf .pytest_cache .coverage coverage.xml htmlcov
 
 reset: clean
+	clear
 	rm -rf .venv logs
+	uv venv
+	uv sync --extra dev --extra api --extra tools
+
+requirements:
+	uv lock --upgrade
+	uv export --format requirements.txt > requirements.txt
