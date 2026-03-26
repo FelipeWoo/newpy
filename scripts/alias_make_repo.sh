@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SCRIPT_URL="https://raw.githubusercontent.com/FelipeWoo/newpy/main/scripts/make_repo.sh"
+SCRIPT_URL="https://raw.githubusercontent.com/FelipeWoo/newpy/refs/heads/master/scripts/make_repo.sh"
 SCRIPT_PATH="$HOME/make_repo.sh"
 ALIASES_FILE="$HOME/.bash_aliases"
 
