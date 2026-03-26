@@ -1,96 +1,135 @@
-# Template Python Project
+# newpy
 
-## Overview
+`newpy` is a lightweight Python starter repo for spinning up new lab or service projects with a consistent structure, `uv`-based dependency management, FastAPI wiring, logging, tests, and a small bootstrap script that can clone this template into a fresh repository.
 
-This is a general-purpose Python project template designed for rapid development and clean structure.  
-It uses `uv` for dependency management and includes support for logging, environment configuration, testing, linting, static type checking, and Jupyter notebooks.
+## What It Includes
 
-## Features
-
-- Structured source code in `src/`
-- Logging system with loguru
-- Environment configuration with dotenv
-- Test suite with pytest
-- Code formatting with black and ruff
-- Static type analysis with ty
-- Jupyter notebook support for exploration
-- Makefile with common automation tasks
+- `uv` for environment and dependency management
+- FastAPI app with basic system routes
+- Pydantic-based boot/config loading from `.env`
+- Centralized `loguru` logging setup
+- `pytest`, coverage, Ruff, Black, and `ty`
+- Optional CLI menu scaffold with `InquirerPy`
+- Helper scripts for cloning this template into a new project
 
 ## Requirements
 
-- Python 3.10 or higher
-- [uv](https://github.com/astral-sh/uv) (package manager)
-- Unix-like system or WSL (recommended)
+- Python 3.12+
+- [`uv`](https://docs.astral.sh/uv/)
+- Git
+- Bash or another Unix-like shell
 
-## Installation
+## Quick Start
 
-Clone the repository and run:
+1. Clone the repo.
+2. Create or update `.env`.
+3. Install dependencies.
+4. Run the app.
 
 ```bash
 make init
-````
-
-This will create the virtual environment and install all required dependencies.
-
-## Running the Project
-
-```bash
 make run
 ```
 
-## Environment Configuration
+The API starts with Uvicorn on `http://0.0.0.0:8000`.
 
-Create a `.env` file based on the provided `.env.example` and customize values as needed.
+## Environment Variables
+
+Current `.env` shape:
 
 ```dotenv
-APP_NAME=template_python
+APP_NAME=my_project
 APP_ENV=development
 LOG_LEVEL=DEBUG
 ```
 
-## Testing
+These values are loaded in [`app/utils/boot.py`](/home/zenon/Documents/300_Projects/SOFTWARE/PUBLIC/newpy/app/utils/boot.py).
+
+## Available Commands
 
 ```bash
+make help
+make init
+make run
 make test
 make cov
-```
-
-## Linting and Formatting
-
-```bash
 make lint
+make format
 make ty
 make check
+make clean
+make reset
+make requirements
 ```
 
-## Jupyter Notebooks
-
-To launch a Jupyter environment:
+Package helpers:
 
 ```bash
-make jupyter
+make add p=requests
+make add-dev p=pytest-mock
+make add-api p=fastapi
+make add-tools p=pandas
 ```
 
-Notebooks are located in `scripts/notebooks/`.
+## API Endpoints
 
-## Project Structure
+Defined in [`app/api/routes/system.py`](/home/zenon/Documents/300_Projects/SOFTWARE/PUBLIC/newpy/app/api/routes/system.py):
 
+- `GET /` returns `{"status": "ok"}`
+- `GET /health` returns `{"service": "running"}`
+- `GET /info` returns app metadata
+
+## Project Layout
+
+```text
+newpy/
+├── app/
+│   ├── api/routes/
+│   ├── cli/
+│   ├── domain/
+│   ├── services/
+│   ├── tests/
+│   ├── main.py
+│   └── utils/
+├── data/
+├── docs/
+├── notebooks/
+├── scripts/
+├── Makefile
+├── pyproject.toml
+└── README.md
 ```
-project/
-├── src/                # Main source code
-├── tests/              # Unit tests
-├── scripts/            # Jupyter notebooks and helper scripts
-├── data/               # Input or reference data
-├── logs/               # Application logs
-├── docs/               # Documentation
-├── Makefile            # Command shortcuts
-├── .env                # Environment variables
-├── requirements.txt    # Dependencies
-├── pyproject.toml      # Configuration for tooling
-└── README.md           # Project information
+
+## Create a New Project From This Template
+
+You can use the included helper script:
+
+```bash
+bash scripts/make_repo.sh my_project
 ```
+
+That script:
+
+- clones this repository into a new folder
+- removes template-local artifacts like `.git`, `.venv`, and caches
+- creates a fresh `.env`
+- creates a `.private/notes.md` scratch file
+- initializes a new Git repository
+
+There is also an installer script for a shell function:
+
+```bash
+bash scripts/alias_make_repo.sh
+source ~/.bash_aliases
+newpy my_project
+```
+
+## Notes
+
+- `make run` launches the FastAPI app from [`app/main.py`](/home/zenon/Documents/300_Projects/SOFTWARE/PUBLIC/newpy/app/main.py).
+- Logging output is configured in [`app/utils/logger.py`](/home/zenon/Documents/300_Projects/SOFTWARE/PUBLIC/newpy/app/utils/logger.py) and writes to `logs/`.
+- The CLI scaffold exists in [`app/cli/menu.py`](/home/zenon/Documents/300_Projects/SOFTWARE/PUBLIC/newpy/app/cli/menu.py), but the current default entrypoint runs the API server.
 
 ## License
 
-This project is licensed under the terms of the LICENSE file.
-
+See [`LICENSE`](/home/zenon/Documents/300_Projects/SOFTWARE/PUBLIC/newpy/LICENSE).
